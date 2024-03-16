@@ -1,0 +1,1237 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <title>💎 2D Кубі-бубі</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no"/>
+</head>
+<body>
+<style>
+    @font-face {
+        font-family: "Play-Regular";
+        font-style: normal;
+        font-weight: 100;
+        src: url(play_regular.ttf);
+    }
+    * {
+        margin: 0;
+        padding: 0;
+        user-select: none;
+        position: relative;
+        font-family: "Play-Regular";
+        color: #e18108;
+        -webkit-text-size-adjust: 100%;
+        -webkit-tap-highlight-color: transparent;
+        scroll-behavior: smooth;
+        text-align: center;
+    }
+    html, body {
+        height: 100vh;
+        background: linear-gradient(#009, #023, #000, #420, #000);
+        overflow: hidden;
+    }
+    .head {
+        margin-top: auto;
+        flex: 1 1 100%;
+    }
+    h1 {
+        font-size: 32px;
+        position: relative;
+        z-index: 5;
+    }
+    h3 {
+        margin-bottom: 10px;
+    }
+    h3 span {
+        color: #090;
+    }
+    main {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        flex-wrap: wrap;
+        place-content: center;
+        align-items: center;
+    }
+    .game {
+        border: 4px solid #000;
+        outline: 4px solid #ea1;
+        border-radius: 30px;
+        background: #000;
+        margin: 0;
+        min-height: 100px;
+        min-width: 100px;
+        overflow: hidden;
+        background: #000;
+        transform: rotate(0deg) scale(1);
+        transition: all 0.3s linear;
+    }
+    .game .one {
+        font-size: 57px;
+        box-shadow: 0 0 0px 2px #000 inset;
+        background: #fff;
+        width: 80px;
+        height: 80px;
+        text-align: center;
+        line-height: 80px;
+        position: absolute;
+        transition: none;
+        transform: translate(-2px, -2px);
+    }
+    .one > div{
+        width: 100%;
+        height: 100%;
+        background-color: #000;
+        box-shadow: 0 0 0px 1px #000 inset;
+        color:transparent;
+    }
+    .game:active {
+        cursor: grabbing;
+    }
+    .panel {
+        margin-bottom: auto;
+        margin-top: 0;
+        flex: 1 1 100%;
+        text-align: center;
+    }
+    button, .btn-group b, .button {
+        outline: none !important;
+        padding: 5px 25px;
+        font-size: 22px;
+        background-image: radial-gradient(#620 20%, #000);
+        border: 2px solid;
+        border-radius: 50%;
+        margin-top: 5px;
+        box-shadow: 0 0 5px 1px #000 inset;
+        text-shadow: 0 0 2px #000;
+        text-align: center;
+        text-decoration: none;
+        transition: all 0.1s linear;
+        cursor: pointer;
+    }
+    button:active, .btn-group b:active, .button:active {
+        color: #ffa231;
+        background-image: radial-gradient(#f60 20%, #000);
+    }
+    .btn-group {
+        font-size: 20px;
+    }
+    .btn-group b {
+        display: inline-block;
+        min-width: 90px;
+        padding: 0;
+        line-height: 28px;
+        font-size: 22px;
+        margin-top: 10px;
+    }
+    .ml-auto {
+        margin-left: auto;
+        text-align: right;
+    }
+    .mr-auto {
+        margin-right: auto;
+        text-align: left;
+    }
+    .coins > div {
+        font-size: 37px;
+        line-height: 70px;
+        height: 80px;
+        width: 55px;
+        margin: 0;
+        position: relative;
+        text-align: center;
+    }
+    .coins > div:before {
+        content: '';
+        position: absolute;
+        width: 100%;
+        height: 4px;
+        background: #ea1;
+        top: 38px;
+        left: 0
+    }
+    .ml-auto.coins div {
+        margin-left: -40px;
+    }
+    .mr-auto.coins div {
+        margin-right: -40px;
+    }
+    .levels {
+        font-size: 18px;
+    }
+    .levels sup {
+        font-size: 12px;
+    }
+    .victory, .loss {
+        position: absolute;
+        z-index: 100;
+        background: #000e;
+        font-size: 42px;
+        color: #4aee00;
+        padding: 40px 100px;
+        border-top: 3px solid;
+        border-bottom: 3px solid;
+        box-shadow: 0 0 25px 10px #000;
+        margin-top: -40px;
+        text-transform: uppercase;
+        text-align: center;
+        opacity: 1;
+        transform: scale(0);
+        transition: transform 0.4s cubic-bezier(.47, .78, .71, 1.48), opacity 0.9s linear;
+    }
+    .victory span {
+        position: absolute;
+        font-weight: bold;
+        font-size: 36px;
+        color: #0f0;
+        top: 10px;
+        left: 0;
+        width: 100%;
+
+        transition: top 1s linear, opacity 1s cubic-bezier(.45, .27, .97, .45);
+        transition-delay: 0.45s;
+        text-shadow: 0 0 1px #000;
+    }
+    .victory.shov span {
+        top: -70px;
+        opacity: 0;
+    }
+    .loss {
+        color: #f00;
+    }
+    .progress {
+        background: #fff;
+        border: none;
+        width: 125px;
+        text-align: left;
+        display: flex;
+        margin: 0 auto;
+        overflow: hidden;
+        border-radius: 2px;
+    }
+    .progress div {
+        background-image: linear-gradient(#090, #5f5);
+        position: relative;
+        left: 0;
+        border-radius: 1px;
+        transition: width 0.3s linear;
+        width: 0%;
+        height: 4px;
+    }
+    .upgrade, .btn-up {
+        background: linear-gradient(#090, #0f0);
+        padding: 0px 6px 2px;
+        display: inline-block;
+        position: relative;
+        border: 2px solid #81ff3a;
+        border-radius: 8px;
+        margin-left: 5px;
+        line-height: 29px;
+        color: #e3e300;
+        font-weight: 100;
+        box-shadow: 0 0 3px 2px #000 inset, 0 0 3px 1px #000;
+        text-shadow: 0 1px 1px #000, 0 -1px 1px #000, -1px 0px 1px #000, 1px 0px 1px #000;
+        font-size: 22px;
+        transition: all 0.05s linear;
+        transform: translateY(-4px);
+        cursor: pointer;
+    }
+    .upgrade.active:after {
+        content: '';
+        position: absolute;
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        background: #d00;
+        top: -6px;
+        right: -7px;
+        box-shadow: 0 0 3px 1px #000;
+    }
+    .btn-up {
+        min-width: 110px;
+        font-size: 17px;
+    }
+    .disable {
+        filter: grayscale(100%);
+        opacity: .6;
+    }
+    .upgrade .dropdown {
+        overflow: hidden;
+        position: absolute;
+        top: calc(100% + 2px);
+        min-width: 250px;
+        right: -24px;
+    }
+    .upgrade .dropdown .shov {
+        padding: 20px 10px 11px;
+        background: #0a0f00ed;
+        margin: -200px 10px 10px 10px;
+        border-radius: 12px;
+        transition: all 0.2s linear;
+        box-shadow: 0 3px 5px 1px #000;
+        border: 2px solid #e18108;
+    }
+    .upgrade .dropdown .shov:before {
+        content: '';
+        position: absolute;
+        top: -10px;
+        right: 26px;
+        border-left: 8px solid #0000;
+        border-right: 8px solid #0000;
+        border-bottom: 9px solid #e18108;
+    }
+    .upgrade.show .dropdown .shov {
+        margin-top: 10px;
+    }
+    .upgrade p {
+        white-space: nowrap;
+        font-size: 17px;
+        line-height: 25px;
+        margin-bottom: 15px;
+        text-align: right;
+        display: flex;
+        justify-content: space-between;
+    }
+    .upgrade p span:first-child {
+        margin-right: 5px;
+    }
+    .upgrade b {
+        font-weight: bold;
+        color: #ff0;
+        margin-left: auto;
+        margin-right: 5px
+    }
+    .upgrade .dropdown p:last-child {
+        margin: 0;
+    }
+    .red {
+        color: #cd5151;
+    }
+    .green {
+        color: #3db31e !important;
+    }
+    .error, .right {
+        position: absolute;
+        top: -20px;
+        transition: all 0.4s linear;
+    }
+    .right {
+        right: 50px;
+    }
+    .top-bar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        z-index: 50;
+    }
+    .info {
+        color: #fff;
+        margin: 12px;
+        border-radius: 50%;
+        border: 3px solid #fff;
+        font-size: 32px;
+        width: 40px;
+        height: 40px;
+        background: #000;
+        background-image: radial-gradient(#3d3dff 10%, #000 62%);
+        background-position: -30px -49px;
+        background-repeat: no-repeat;
+        background-size: 100px 100px;
+        box-shadow: 0 0 1px 1px #000 inset, 0 0 2px 1px #000;
+        text-shadow: 1px 0 2px #000;
+        transition: all 0.1s linear;
+        cursor: pointer;
+    }
+    .info:active {
+        background-position: -30px -14px;
+        transform: translate(0, 4px) scale(1.05);
+    }
+    .info-block {
+        background: #000e;
+        position: fixed;
+        width: 100vw;
+        height: 100vh;
+        left: -100%;
+        top: 0;
+        transition: left 0.2s linear;
+    }
+    .info-block.show {
+        left: 0%;
+    }
+    .info-block * {
+        color: #fff;
+    }
+    .info-block .close {
+        position: absolute;
+        right: 16px;
+        font-size: 30px;
+        top: 0px;
+    }
+    .info-block .scroll {
+        height: calc(100vh - 46px);
+        overflow: auto;
+        padding: 15px 35px;
+    }
+    .info-block h3 {
+        text-align: center;
+        text-transform: uppercase;
+        font-size: 22px;
+        font-weight: bold;
+        line-height: 46px;
+        margin: 0;
+    }
+    .info-block > h3 {
+        background: #000;
+        font-size: 38px;
+        font-weight: 100;
+    }
+    .info-block p {
+        text-align: left;
+        font-size: 18px;
+        margin: 0 0 15px 0;
+        line-height: 26px;
+    }
+    @media (max-width: 412px) {
+        .game .one {
+            font-size: 46px;
+            width: 68px;
+            height: 68px;
+            line-height: 66px;
+            box-shadow: 0 0 0 1px #000 inset;
+        }
+
+        .coins > div {
+            font-size: 30px;
+            line-height: 66px;
+            height: 68px;
+        }
+
+        .coins > div::before {
+            top: 32px;
+        }
+    }
+    @media (max-width: 370px) {
+        .game .one {
+            font-size: 42px;
+            width: 60px;
+            height: 60px;
+            line-height: 58px;
+            box-shadow: 0 0 0 1px #000 inset;
+        }
+
+        .coins > div {
+            font-size: 30px;
+            line-height: 58px;
+            height: 60px;
+        }
+
+        .coins > div::before {
+            top: 30px;
+        }
+    }
+</style>
+<main>
+    <div class="head">
+        <div class="top-bar">
+            <div class="info">?</div>
+            <div class="info-block">
+                <h3>Правила гри <div class="close">✖</div></h3>
+                <div class="scroll">
+                    <h3>Умова виграшу</h3>
+                    <p>Потрібно скласти горизонтально предмети що вказані за межами ігрового поля. Переміщуючи предмети
+                        по вертикалі або горизонталі обмежену кількість ходів, якак
+                        вираховуеться суммарною кількістью клітин квадрату плюс додаткові ходи які можна збільшити на
+                        постійній основі за монети (зелена кнопка [up⬆]).</p>
+                    <p>Прокрутка кожної лінії йде по кругу і відраховує один хід, незалежно від протяжності прокрутки.
+                        Якщо порядок предметів прокрученої лінії не змінюється хід не відраховується.</p>
+
+                    <h3>Механізм зарахувань монет</h3>
+                    <p>Монети зараховуються кількістью залишкових ходів, при умові виграшу (якщо всі лінії складені в
+                        потрібному порядку) потім множиться на складність гри:</br>
+                        &#8199;&#8199;▶ (3 на 3) = х1</br>
+                        &#8199;&#8199;▶ (4 на 4) = х2</br>
+                        &#8199;&#8199;▶ (5 на 5) = х3</p>
+                    <p>Отриманий добуток ще раз множиться на "множник монет" який можна збільшити за монети (зелена
+                        кнопка [up⬆]).</p>
+
+                    <p>Також, кожні 30 секунд Вам будуть нараховані монети. Кількість нарахувань вираховуеться за
+                        наступною логікою (ваш рівень) * (множник досвіду)</p>
+
+                    <h3>Автогра</h3>
+                    <p>Гра автоматично складає пердмети в правильному порядку, показуючи механізми рішень переміщеня
+                        предметів в потрібні лінії та в якій послідовності їх потрібно переміщувати.</p>
+                    <p>Автоматика робить багато зайвих ходів і тратить багато часу. Потребує
+                        багато ходів на великих мапах "4 на 4" і вище.</p>
+
+                    <h3>Вибір складності</h3>
+                    <p>Ви можете обирати складність (кнопки [-] та [+]) не залежно від вашого рівня. Кожна наступна
+                        складність впливає на добуток монет (від залишкових ходів). Та сам досвід (exp) аналогічно монетам окрім залишкових ходів.</p><p>
+                        Максимальна складність залежить від максимальної ширини єкрану і вираховується автоматично. Кожна зміна складності відраховує
+                        одну монету.</p>
+
+                    <h3>Ціни покращення</h3>
+                    <p>Кожне покращення окремого скіла збільшує вартість наступного його покращення до кінцевого ліміту. А
+                        кожен досягнутий рівень зменшує вартість "прокачки" на число самого рівня множенного на множник досвіду.</p>
+                    <p> <br> </p>
+                    <p> <br> </p>
+
+                </div>
+            </div>
+        </div>
+        <div class="levels">
+            <div>
+                <div class="progress">
+                    <div id="levelProgress" data-max="5" data-val="0"></div>
+                </div>
+            </div>
+            <div>Рівень <b class="lvl">1</b> <sup id="exp">0/10exp</sup></div>
+        </div>
+        <h1>Баланс <b class="money">5001</b>⛀
+            <div class="upgrade">up⬆
+                <div class="dropdown">
+                    <div class="shov">
+                        <p class="hod"></p>
+                        <p class="mnoj"></p>
+                        <p class="exp"></p>
+                    </div>
+                </div>
+            </div>
+        </h1>
+        <h3>Завершіть гру за <span>0</span> ходів</h3>
+    </div>
+    <div class="ml-auto coins">l</div>
+    <div class="game"></div>
+    <div class="mr-auto coins">r</div>
+    <div class="panel">
+        <div class="btn-group"><b class="minus">-</b> <span> 0 </span> <b class="plus">+</b></div>
+        <button>Оновити! -1⛀</button>
+        <br>
+        <br>
+        <a class="button run-bot">авто гра</a>
+    </div>
+</main>
+<script>
+    function $(e) {
+        return document.querySelector(e);
+    }
+    function $a(e) {
+        return document.querySelectorAll(e);
+    }
+    $('.close').onclick = $('.info').onclick = () => {
+        $('.info-block').classList.toggle('show')
+    }
+    var addHod = 0,
+        addMnoj = 1,
+        addExp = 1,
+        char = ['🍒', '🍇', '🍓', '🍍', '🍏', '🍺', '🍋', '🍹', '🍄', '🍌', '🍂', '🍀', '🌽', '🍅', '🍆', '🌰', '🎁', '💖', '💎'],
+        holst = $('.game'),
+        htmHod = $('h3 span'),
+        lvl = $('.lvl'),
+        money = $('.money'),
+        levelProgress = $('#levelProgress'),
+        combo = [],
+        maxAge = 3,
+        victory = false,
+        hod = 0,
+        dump = '',
+        targets = null,
+        exp = $('#exp'),
+        priceHod = [10, 15, 25, 50, 75, 100, 125, 150, 200, 300, 400, 800, 1500, 2000, 8000, 24000, 60000],
+        priceMnoj = [0, 100, 250, 300, 750, 1000, 1500, 2500, 4000, 6000, 9000, 28000, 75000],
+        priceExp = [0, 100, 350, 600, 850, 2000, 3500, 4000, 4500, 5000, 7000, 8000, 22000, 58500],
+        minUpgradePrice = 0,
+        levelupStep = 5,
+        level = 1,
+        lang = 'uk',
+        upgradeBtn = [
+            {
+                el: $('.upgrade .hod'),
+                id: 'addHod',
+                price: priceHod,
+                label: 'Додатковий хід',
+                prefix: '+',
+                updateEl: [htmHod, () => {
+                    hod++
+                }]// array
+            },
+            {
+                el: $('.upgrade .mnoj'),
+                id: 'addMnoj',
+                price: priceMnoj,
+                label: 'Множник монет',
+                prefix: 'x',
+                updateEl: null
+            },
+            {
+                el: $('.upgrade .exp'),
+                id: 'addExp',
+                price: priceExp,
+                label: 'Множник досвіду',
+                prefix: 'x',
+                updateEl: null
+            },
+        ];
+    let widthLimit = 121;
+    function loadSave() {
+        try {
+            let items = JSON.parse(localStorage.getItem('userGame'))
+            for (let [k, v] of Object.entries(items)) {
+                window[k] = v
+            }
+
+            htmHod.innerText = maxAge * maxAge + addHod
+            money.innerText = parseInt(mainMoney) + 1
+            lvl.innerText = level
+
+            levelProgress.dataset.max = level * levelupStep
+            levelProgress.dataset.val = progress
+
+            exp.innerHTML = parseInt(levelProgress.dataset.val) + '/' + parseInt(levelProgress.dataset.max) + 'exp'
+            levelProgress.style.width = 100 / parseInt(levelProgress.dataset.max) * parseInt(levelProgress.dataset.val) + '%';
+
+            setTimeout(() => {
+                if (maxAge == 3) {
+                    $('.minus').classList.add('disable')
+                }
+                if (window.innerWidth < parseInt(window.getComputedStyle($('.game>div')).width) * maxAge + widthLimit) {
+                    $('.plus').classList.add('disable')
+                }
+            }, 900)
+
+            isActiveBtn()
+        } catch (e) {
+            return null
+        }
+    }
+    loadSave()
+    setInterval(() => {
+        money.innerHTML = parseInt(money.innerHTML) + (addExp * level)
+        isActiveBtn()
+        saveGame()
+    }, 30000);
+    function saveGame() {
+        try {
+            localStorage.setItem('userGame', JSON.stringify({
+                    level: level,
+                    mainMoney: parseInt(money.innerText),
+                    addHod: addHod,
+                    addMnoj: addMnoj,
+                    addExp: addExp,
+                    minUpgradePrice: minUpgradePrice,
+                    progress: parseInt(levelProgress.dataset.val),
+                    maxAge: maxAge,
+                    lang: lang
+                })
+            )
+            return true
+        } catch (e) {
+            return false
+        }
+    }
+    $('.upgrade').onclick = e => {
+        if (e.target && e.target.classList.contains('upgrade')) {
+            e.target.classList.toggle('show')
+            if (e.target.classList.contains('show')) {
+                minUpgradePrice = 0
+                upgradeBtn.forEach((e, i) => {
+                    let val = window[e.id],
+                        summa = val >= 0 && val <= e.price.length - 1 ? e.price[val] - (level * addExp) : e.price[e.price.length - 1] - (level * addExp)
+                    minUpgradePrice = minUpgradePrice == 0 ? summa : Math.min(minUpgradePrice, summa)
+                    e.el.innerHTML = `<span>${e.label} </span> <b>${e.prefix + val}</b> <span data-id="${e.id}" data-index="${i}" class="btn-up${money.innerText < summa ? ' disable' : ''}">up⬆ -${summa}⛀</span>`
+                })
+
+                $('.upgrade .shov').onclick = e => {
+                    if (!e.target.classList.contains('btn-up'))
+                        return;
+
+                    let el = e.target,
+                        localMoney = parseInt(money.innerText),
+                        val = window[el.dataset.id],
+                        skill = upgradeBtn[el.dataset.index],
+                        summa = val >= 0 && val <= skill.price.length - 1 ? skill.price[val] - (level * addExp) : skill.price[skill.price.length - 1] - (level * addExp),
+                        btn = el.parentNode
+
+                    if (localMoney >= summa) {
+                        localMoney -= summa
+                        val = window[el.dataset.id]++
+                        val = window[el.dataset.id]
+                        money.innerText = localMoney;
+
+                        if (skill.updateEl) {
+                            skill.updateEl.forEach(a => {
+                                if (typeof a == 'function') {
+                                    a();
+                                } else {
+                                    a.innerText = (parseInt(a.innerText) + 1)
+                                }
+                            })
+                        }
+
+                        let span = document.createElement('span')
+                        span.className = 'right green'
+                        span.innerHTML = '<b class="green">+1</b>'
+                        setTimeout(() => {
+                            span.style = 'top:-40px;opacity:0;'
+                            setTimeout(() => {
+                                span.remove()
+                            }, 400)
+                        }, 10)
+                        btn.append(span)
+
+                        el.parentNode.querySelector('b').innerText = skill.prefix + window[el.dataset.id]
+                        summa = val >= 0 && val <= skill.price.length - 1 ? skill.price[val] - (level * addExp) : skill.price[skill.price.length - 1] - (level * addExp)
+                        el.innerHTML = 'up⬆ -' + summa + '⛀'
+                        money.innerText < summa ? (el.classList.add('disable')) : ''
+
+                        minUpgradePrice = 0
+                        el.parentNode.parentNode.querySelectorAll('.btn-up').forEach(i => {
+                            skill = upgradeBtn[i.dataset.index]
+                            let val = window[skill.id],
+                                summa = val >= 0 && val <= skill.price.length - 1 ? skill.price[val] - (level * addExp) : skill.price[skill.price.length - 1] - (level * addExp)
+                            minUpgradePrice = minUpgradePrice == 0 ? summa : Math.min(minUpgradePrice, summa)
+                            money.innerText < summa ? (i.classList.add('disable')) : ((i.classList.remove('disable')))
+                            i.innerHTML = `up⬆ -${summa}⛀`
+                        })
+                        saveGame()
+                        isActiveBtn()
+
+                    } else {
+                        let span = document.createElement('span')
+                        span.className = 'error red'
+                        span.innerText = 'Не достатньо монет 😓!'
+                        setTimeout(() => {
+                            span.style = 'top:-40px;opacity:0;'
+                            setTimeout(() => {
+                                span.remove()
+                            }, 400)
+                        }, 1000)
+                        btn.append(span)
+                    }
+
+                }
+            }
+        } else {
+            return;
+        }
+
+        $('body').onclick = h => {
+            if (h.target && !h.target.closest('.upgrade')) {
+                $('body').onclick = false
+                $('.upgrade').classList.remove('show')
+            }
+        }
+    }
+    $('.btn-group').parentNode.querySelector('span').innerHTML = maxAge + ' x ' + maxAge;
+    $('.btn-group').onclick = e => {
+        if (victory) {
+            return;
+        }
+        isActiveBtn()
+
+        let box = parseInt(window.getComputedStyle($('.game>div')).width)
+        if (e.target.classList.contains('minus')) {
+            if (maxAge > 3) {
+                maxAge--
+                $('.plus').classList.remove('disable')
+                e.target.parentNode.querySelector('span').innerHTML = maxAge + ' x ' + maxAge
+                $('button').click();
+                saveGame()
+            }
+            if (maxAge == 3) {
+                $('.minus').classList.add('disable')
+            }
+        } else if (e.target.classList.contains('plus')) {
+            if (maxAge < char.length && window.innerWidth > box * maxAge + widthLimit) {
+                maxAge++
+                $('.minus').classList.remove('disable')
+                e.target.parentNode.querySelector('span').innerHTML = maxAge + ' x ' + maxAge
+                $('button').click();
+                saveGame()
+            }
+            if (window.innerWidth < box * maxAge + widthLimit) {
+                $('.plus').classList.add('disable')
+            }
+        }
+    }
+    function isActiveBtn() {
+        if (minUpgradePrice >= money.innerHTML) {
+            $('.upgrade').classList.remove('active')
+        } else {
+            $('.upgrade').classList.add('active')
+        }
+    }
+    function turn(a, c) {
+        c = c || 0;
+        if (c > 0) {
+            a.unshift(a.pop())
+            return a
+        } else {
+            let tmp = a.shift()
+            a.push(tmp)
+            return a
+        }
+    }
+    function rearrangement(box) {
+        $a('.duble')?.forEach(e => e.remove())
+        $a('.one.x0').forEach(e => {
+            let a = e.cloneNode()
+            a.style.left = box * maxAge + 'px'
+            a.innerHTML = e.innerHTML
+            a.classList.add('duble')
+            holst.append(a)
+        })
+        $a('.one.x' + (maxAge - 1)).forEach(e => {
+            let a = e.cloneNode()
+            a.style.left = -box + 'px'
+            a.innerHTML = e.innerHTML
+            a.classList.add('duble')
+            holst.append(a)
+        })
+        $a('.one.y0').forEach(e => {
+            let a = e.cloneNode()
+            a.style.top = box * maxAge + 'px'
+            a.innerHTML = e.innerHTML
+            a.classList.add('duble')
+            holst.append(a)
+        })
+        $a('.one.y' + (maxAge - 1)).forEach(e => {
+            let a = e.cloneNode()
+            a.style.top = -box + 'px'
+            a.innerHTML = e.innerHTML
+            a.classList.add('duble')
+            holst.append(a)
+        })
+    }
+    isActiveBtn()
+    $('button').onclick = () => {
+        if (victory) {
+            return;
+        }
+        isActiveBtn()
+        money.innerHTML = parseInt(money.innerHTML) - 1
+        htmHod.innerHTML = hod = (maxAge * maxAge) + addHod
+        holst.style.transform = 'rotate(-360deg) scale(0.01)'
+
+        setTimeout(() => {
+            saveGame()
+            setTimeout(() => {
+                holst.style.transition = 'none'
+                holst.style.transform = 'scale(.01)'
+                setTimeout(() => {
+                    holst.style.transition = '';
+                    setTimeout(() => {
+                        holst.style.transform = ''
+                    }, 10)
+                }, 200)
+            }, 10)
+
+            holst.innerHTML = '<div class="one"></div>';
+            let box = parseInt(window.getComputedStyle($('.game>div')).width),
+                width = (box * maxAge) - 4 + 'px',
+                pattern = char.sort(() => Math.random() - 0.5),
+                maps = [];
+            combo = [];
+            holst.innerHTML = '';
+            holst.style.width = holst.style.height = width;
+
+            for (let y = 0; y < maxAge; y++) {
+                combo.push(pattern[y])
+                for (let x = 0; x < maxAge; x++) {
+                    maps.push(pattern[x])
+                }
+            }
+            let [left, right] = $a('.coins')
+            left.innerHTML = right.innerHTML = '';
+            combo.forEach((e, i) => {
+                left.innerHTML = right.innerHTML += `<div><span>${e}</span></div>`
+            })
+
+            maps.sort(() => Math.random() - 0.5)
+            let x = 0, y = 0;
+            maps.forEach((e, i) => {
+                if (x === maxAge) {
+                    x = 0;
+                    y++
+                }
+                holst.innerHTML += `<div class="one y${y} x${x}" style="left:${box * x}px;top:${box * y}px">${e}</div>`
+                x++
+            })
+            x--
+
+            rearrangement(box)
+
+            holst.ontouchstart =
+                holst.onmousedown = e => {
+                    let line = e.target.closest('.one'), mx = e.clientX || e.changedTouches[0].clientX,
+                        my = e.clientY || e.changedTouches[0].clientY, direct = 0,//direct: 1=left|right 2=top|bottom
+                        selY = line.className.match(/y[0-9]+/).toString(),
+                        selX = line.className.match(/x[0-9]+/).toString(), diapason = 5;
+                    dump = holst.innerText
+
+                    targets = holst
+
+                    const run = m => {
+                        m.preventDefault()
+                        if (hod <= 0) {
+                            return;
+                        }
+                        if (typeof m.clientX == 'undefined') {
+                            m = m.changedTouches[0]
+                        }
+                        if (((mx < m.clientX - diapason || mx > m.clientX + diapason) && direct === 0) || direct === 1) {
+                            direct = 1
+                            if (m.clientX - mx > box / 2) {
+                                mx = m.clientX + box / 2
+                                let oldChar = [];
+                                $a('.one.' + selY + ':not(.duble)').forEach(n => {
+                                    oldChar.push(n.innerHTML)
+                                })
+                                oldChar = turn(oldChar, 1)
+                                $a('.one.' + selY).forEach((n, i) => {
+                                    n.innerHTML = oldChar[i]
+                                })
+                                rearrangement(box)
+                            }
+                            if (m.clientX - mx < -box / 2) {
+                                mx = m.clientX - box / 2
+                                let oldChar = [];
+                                $a('.one.' + selY + ':not(.duble)').forEach(n => {
+                                    oldChar.push(n.innerHTML)
+                                })
+                                oldChar = turn(oldChar, 0)
+                                $a('.one.' + selY).forEach((n, i) => {
+                                    n.innerHTML = oldChar[i]
+                                })
+                                rearrangement(box)
+                            }
+                            $a('.one.' + selY).forEach(n => {
+                                n.style.marginLeft = `${m.clientX - mx}px`
+                            })
+                        }
+                        if (((my < m.clientY - diapason || my > m.clientY + diapason) && direct === 0) || direct === 2) {
+                            direct = 2
+                            if (m.clientY - my > box / 2) {
+                                my = m.clientY + box / 2
+                                let oldChar = [];
+                                $a('.one.' + selX + ':not(.duble)').forEach(n => {
+                                    oldChar.push(n.innerHTML)
+                                })
+                                oldChar = turn(oldChar, 1)
+                                $a('.one.' + selX).forEach((n, i) => {
+                                    n.innerHTML = oldChar[i]
+                                })
+                                rearrangement(box)
+                            }
+                            if (m.clientY - my < -box / 2) {
+                                my = m.clientY - box / 2
+                                let oldChar = [];
+                                $a('.one.' + selX + ':not(.duble)').forEach(n => {
+                                    oldChar.push(n.innerHTML)
+                                })
+                                oldChar = turn(oldChar, 0)
+                                $a('.one.' + selX).forEach((n, i) => {
+                                    n.innerHTML = oldChar[i]
+                                })
+                                rearrangement(box)
+                            }
+                            $a('.one.' + selX).forEach(n => {
+                                n.style.marginTop = `${m.clientY - my}px`
+                            })
+                        }
+                    }
+
+                    holst.ontouchmove = holst.onmousemove = run
+                }
+        }, 300)
+    }
+    function gameSuccsessLine() {
+        for (let i in combo) {
+            for (let line of $a('.game .one.y' + i + ':not(.duble)')) {
+                if (combo[i] !== line.innerHTML) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+    function endTouch() {
+        if (victory) {
+            return;
+        }
+        if (dump !== holst.innerText) {
+            targets && hod--
+        }
+        targets = null
+        htmHod.innerHTML = hod
+        $a('.game .one').forEach(n => {
+            n.style.transition = 'all 0.1s linear'
+            setTimeout(() => {
+                n.style.marginLeft = ''
+                n.style.marginTop = ''
+
+                setTimeout(() => {
+                    n.style.transition = ''
+                }, 100)
+            }, 10)
+        });
+
+        holst.ontouchmove = holst.onmousemove = false;
+
+        if (gameSuccsessLine()) {
+            holst.ontouchstart = holst.onmousedown = false;
+            victory = true
+            money.innerHTML = (parseInt(money.innerHTML) + ((hod * (maxAge - 2)) * addMnoj))
+            isActiveBtn()
+            $('body').onmouseup = $('body').ontouchend = false
+
+
+            levelProgress.dataset.val = parseInt(levelProgress.dataset.val) + ((maxAge - 2) * addExp)
+            levelProgress.style.width = 100 / parseInt(levelProgress.dataset.max) * parseInt(levelProgress.dataset.val) + '%';
+            let oldLevel = level, oldVal = levelProgress.dataset.val
+            if (levelProgress.dataset.val >= level * levelupStep) {
+                levelProgress.dataset.val = 0
+                setTimeout(() => {
+                    levelProgress.style.transition = 'none';
+                    levelProgress.style.width = 0;
+
+                    setTimeout(() => {
+                        levelProgress.style.transition = '';
+                        levelProgress.dataset.val = parseInt(oldVal) - oldLevel * levelupStep
+                        levelProgress.style.width = 100 / parseInt(levelProgress.dataset.max) * parseInt(levelProgress.dataset.val) + '%';
+                        exp.innerHTML = parseInt(levelProgress.dataset.val) + '/' + parseInt(levelProgress.dataset.max) + 'exp';
+                    }, 20)
+                }, 300)
+                level++
+            }
+            lvl.innerHTML = level
+            levelProgress.dataset.max = level * levelupStep
+            exp.innerHTML = parseInt(levelProgress.dataset.val) + '/' + parseInt(levelProgress.dataset.max) + 'exp'
+
+            setTimeout(() => {
+                let div = document.createElement('div')
+                div.className = 'victory'
+                div.innerHTML = '<span>+' + (maxAge - 2) * addExp + 'exp</span>'
+                div.innerHTML += 'готово' + (hod > 0 ? (' +' + ((hod * (maxAge - 2))) * addMnoj) + '⛀ ' : '') + '!'
+                div.style.transform = 'scale(.001)'
+                holst.parentNode.append(div);
+                setTimeout(() => {
+                    div.style.transform = 'scale(1)'
+                    div.classList.add('shov')
+                    setTimeout(() => {
+                        div.style.opacity = 0
+                        victory = false;
+                        money.innerHTML = parseInt(money.innerHTML) + 1 // не помітно не відліковувати монети при виграші
+                        $('button').click();
+                        setTimeout(() => {
+                            $('body').onmouseup = $('body').ontouchend = endTouch
+                            div.remove();
+                        }, 800)
+                    }, 1500)
+                }, 100)
+            }, 10)
+        } else if (hod === 0) {
+            holst.ontouchstart = holst.onmousedown = false;
+            victory = true// victory bot
+            $('body').onmouseup = $('body').ontouchend = false
+            setTimeout(() => {
+                let div = document.createElement('div')
+                div.className = 'loss'
+                div.innerHTML = 'програш!'
+                holst.parentNode.append(div)
+                setTimeout(() => {
+                    div.style.transform = 'scale(1)'
+                    setTimeout(() => {
+                        div.style.opacity = 0
+                        victory = false
+                        $('button').click();
+                        setTimeout(() => {
+                            $('body').onmouseup = $('body').ontouchend = endTouch
+                            div.remove();
+                        }, 500)
+                    }, 2000)
+                }, 100)
+            }, 10)
+        }
+    }
+    $('body').onmouseup = $('body').ontouchend = endTouch
+    $('button').click();
+    function botMove(m, x, y) {// m = (-1 || +2) < maxAge
+        let box = parseInt(window.getComputedStyle($('.game>div')).width),
+            line = x > 0 ? 'x' + (x - 1) : 'y' + (y - 1),
+            moveInterval = 0,
+            movePosition = 0,
+            oldM = m
+
+        let selectLine = holst.querySelectorAll('.one.' + line)
+        if (m !== 0) {
+            moveInterval = setInterval(() => {
+                movePosition = m > 0 ? movePosition + 2 : movePosition - 2
+                if (box < Math.abs(movePosition)) {
+                    m = m > 0 ? m - 1 : m + 1
+                    movePosition = 0
+                    let oldChar = [];
+                    $a('.one.' + line + ':not(.duble)').forEach(n => {
+                        oldChar.push(n.innerHTML)
+                    })
+                    oldChar = turn(oldChar, (oldM > 0 ? 1 : 0))
+                    $a('.one.' + line).forEach((n, i) => {
+                        n.innerHTML = oldChar[i]
+                    })
+                    rearrangement(box)
+                    selectLine = holst.querySelectorAll('.one.' + line)
+                }
+                selectLine.forEach(n => {
+                    if (x !== 0) {
+                        n.style.marginTop = `${movePosition}px`
+                    } else {
+                        n.style.marginLeft = `${movePosition}px`
+                    }
+                })
+
+                if (movePosition === 0 && m === 0) {
+                    clearInterval(moveInterval)
+                    targets = holst
+                    endTouch()
+                }
+            }, 10)
+        }
+    }
+    function botView() {
+        let sort = [], y = 0,
+            map = [];
+        map[0] = [];
+
+        $a('.ml-auto.coins span').forEach(e => sort.push(e.innerText))
+        $a('.game .one:not(.duble)').forEach(e => {
+            map[y].push(sort.indexOf(e.innerText))
+            if (maxAge === map[y].length) {
+                y++
+                map[y] = []
+            }
+        })
+        return map
+    }
+    function stupedBot() {
+        let rezult = botView(), box = parseInt(window.getComputedStyle($('.game>div')).width),
+            generalTimeSleep = 14;
+
+        function searchWrong() {
+            for (let y in rezult) {
+                for (let x in rezult[y]) {
+                    if (rezult[y][x] != y) {
+                        return [parseInt(y), parseInt(x)]
+                    }
+                }
+            }
+        }
+
+        function searchBottom(s, x) {
+            for (let y in rezult) {
+                if (rezult[y][x] == s) {
+                    return parseInt(y)
+                }
+            }
+            return false
+        }
+
+        function hod() {
+            let wr = searchWrong()
+            if (!wr) {
+                return
+            }
+            for (let y in rezult) {
+                y = parseInt(y)
+                for (let x in rezult[y]) {
+                    x = parseInt(x)
+                    if (wr[0] < y && rezult[y][x] == wr[0] && wr[0] == 0) {
+                        if (wr[1] != x) {
+                            let bottom = searchBottom(wr[0], wr[1])
+                            if (bottom) {
+                                botMove(wr[0] - bottom, wr[1] + 1, 0)
+                            } else {
+                                botMove(wr[1] - x, 0, (y + 1))
+                            }
+                            return Math.abs(bottom ? (wr[0] - bottom) : (wr[1] - x)) * box * generalTimeSleep;
+                        } else {
+                            botMove(wr[0] - y, wr[1] + 1, 0)
+                            return Math.abs(wr[0] - y) * box * generalTimeSleep;
+                        }
+                    }
+                    if (wr[0] < y && rezult[y][x] == wr[0] && wr[0] > 0) {
+
+                        let bottom = searchBottom(wr[0], wr[1])
+
+                        if (bottom && (bottom == y)) {// wr[0]+1 неа
+
+                            botMove(wr[1] == 0 ? 1 : -1, 0, bottom + 1)
+                            allTim = setTimeout(() => {
+                                botMove(y - wr[0], wr[1] + 1, 0)
+                                allTim = setTimeout(() => {
+                                    botMove(wr[1] == 0 ? -1 : 1, 0, bottom + 1)
+                                    allTim = setTimeout(() => {
+                                        botMove(-(y - wr[0]), wr[1] + 1, 0)
+                                    }, box * generalTimeSleep)
+                                }, (y - wr[0]) * box * generalTimeSleep)
+                            }, box * generalTimeSleep)
+                            return box * generalTimeSleep * 2 + ((y - wr[0]) * box * generalTimeSleep) * 2;
+                        } else {
+                            botMove(y - wr[0], wr[1] + 1, 0)//botMove(pin,|, -)
+                            allTim = setTimeout(() => {
+                                botMove(wr[1] - x, 0, y + 1)
+                                allTim = setTimeout(() => {
+                                    botMove(-(y - wr[0]), wr[1] + 1, 0)
+                                }, Math.abs(wr[1] - x) * box * generalTimeSleep)
+                            }, Math.abs(y - wr[0]) * box * generalTimeSleep)
+                            return (Math.abs(y - wr[0]) * box * generalTimeSleep) * 2 + (Math.abs(wr[1] - x) * box * generalTimeSleep);
+                        }
+                    }
+                }
+            }
+        }
+
+        return hod()
+    }
+    let isRunBot = false, run = 0, mainTime = 0, allTim = 0;
+    function runBot() {
+
+        const start = () => {
+            run = stupedBot()
+            mainTime = setTimeout(() => {
+                if (!victory) {
+                    start()
+                }
+            }, run + 100)
+        }
+
+        if (!isRunBot) {
+            isRunBot = true
+            $('.run-bot').innerText = 'стоп'
+
+            $('html').ontouchstart = $('html').onmousedown = e => {
+                if (e.target != $('.run-bot')) {
+                    $('.run-bot').innerText = 'Авто гра'
+                    $('html').ontouchstart = $('html').onmousedown = isRunBot = false
+                }
+            }
+            start()
+        } else {
+            isRunBot = false
+            $('.run-bot').innerText = 'Авто гра'
+            return
+        }
+
+        let stopThis = setInterval(() => {
+            if (victory || isRunBot === false) {
+                clearInterval(stopThis)
+                clearTimeout(mainTime)
+                clearTimeout(allTim)
+                isRunBot && setTimeout("runBot()", 4000)
+                isRunBot = false
+                $('body').click()
+            }
+        }, 10)
+    }
+    $('.run-bot').onclick = runBot
+</script>
+</body>
+</html>
